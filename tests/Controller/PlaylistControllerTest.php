@@ -23,4 +23,13 @@ class PlaylistControllerTest extends WebTestCase
         $client->request('GET', '/playlists');
         $this->assertResponseIsSuccessful();
     }
+    public function testPlaylistEditPageWhenLoggedIn(): void
+    {
+        $client = static::createClient();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $user = $userRepository->findOneByEmail('jennings.schuppe@example.net');
+        $client->loginUser($user);
+        $client->request('GET', '/playlist/16/edit');
+        $this->assertResponseIsSuccessful();
+    }
 }
