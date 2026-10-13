@@ -126,44 +126,83 @@ templates/
 
 ---
 
+## Prérequis
+
+- Docker et Docker Compose
+
 ## Installation
 
-### Prérequis
-- **Serveur Ubuntu** (ou environnement Linux)
-- **Docker** + Docker Compose
-- PHP 8.2+
-- Composer
-- Symfony CLI
+```bash
+# 1. Construire et démarrer les conteneurs
+docker compose up -d --build
 
-### Étapes
+# 2. Installer les dépendances PHP
+docker compose exec php composer install
+
+# 3. Créer le fichier .env.local avec l'accès à la base
+echo 'DATABASE_URL="mysql://root:root@db:3306/harmonia?serverVersion=10.6.25-MariaDB&charset=utf8mb4"' > .env.local
+
+# 4. Créer la base et jouer les migrations
+docker compose exec php php bin/console doctrine:database:create --if-not-exists
+docker compose exec php php bin/console doctrine:migrations:migrate --no-interaction
+
+# 5. Charger les fixtures (données de test)
+docker compose exec php php bin/console doctrine:fixtures:load --no-interaction
+```
+
+## Accès
+
+| Service    | URL                   |
+|------------|-----------------------|
+| Site       | http://localhost:8000 |
+| phpMyAdmin | http://localhost:9988 |
+
+Base de données depuis l'hôte (client SQL) : `127.0.0.1:3506`, utilisateur `root`, mot de passe `root`.
+
+> ⚠️ Dans `.env.local`, l'hôte est `db:3306` (nom du service Docker) et non `127.0.0.1:3506` :
+> Symfony tourne dans le conteneur `php`, où `127.0.0.1` désigne le conteneur lui-même.
+
+## Commandes utiles
 
 ```bash
-# 1. Cloner le projet
-git clone https://github.com/ton-pseudo/harmonia.git
-cd harmonia
-
-# 2. Lancer la base de données MariaDB via Docker là ou le fichier compose.yaml existe dans un dossier
+# Démarrer / arrêter
 docker compose up -d
+docker compose down
 
-# 3. Installer les dépendances PHP
-composer install
+# Voir les logs
+docker compose logs -f php
+docker compose logs -f db
 
-# 4. Configurer la base de données dans .env
-# MariaDB tourne sur le port 3506 via Docker
-DATABASE_URL="mysql://user:password@127.0.0.1:3506/harmonia"
+# Ouvrir un terminal dans le conteneur PHP
+docker compose exec php bash
 
-# 5. Créer la base de données et les tables
-symfony console doctrine:database:create
-symfony console doctrine:migrations:migrate
+# Console Symfony
+docker compose exec php php bin/console <commande>
 
-# 6. Charger les fixtures (données de test)
-symfony console doctrine:fixtures:load
+# Composer
+docker compose exec php composer require <paquet>
 
-# 7. Lancer le serveur
-symfony serve
+# Créer une migration après modification d'une entité, puis l'appliquer
+docker compose exec php php bin/console make:migration
+docker compose exec php php bin/console doctrine:migrations:migrate --no-interaction
 
-# 8. Arrêter le serveur
-symfony server:stop
+# Recharger les fixtures (⚠️ vide la base)
+docker compose exec php php bin/console doctrine:fixtures:load --no-interaction
+
+# Vider le cache
+docker compose exec php php bin/console cache:clear
+
+# Lancer les tests
+docker compose exec php php bin/phpunit
+```
+
+## Réinitialiser complètement la base
+
+```bash
+docker compose exec php php bin/console doctrine:database:drop --force
+docker compose exec php php bin/console doctrine:database:create
+docker compose exec php php bin/console doctrine:migrations:migrate --no-interaction
+docker compose exec php php bin/console doctrine:fixtures:load --no-interaction
 ```
 
 ---
