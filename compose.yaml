@@ -1,25 +1,45 @@
-
 services:
-###> doctrine/doctrine-bundle ###
-  database:
-    image: postgres:${POSTGRES_VERSION:-16}-alpine
+  db:
+    image: mariadb:10.6
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
-      POSTGRES_USER: ${POSTGRES_USER:-app}
-    healthcheck:
-      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
-      timeout: 5s
-      retries: 5
-      start_period: 60s
+      - MYSQL_DATABASE=harmonia
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - 3506:3306
     volumes:
-      - database_data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
-###< doctrine/doctrine-bundle ###
-
+      - db_data:/var/lib/mysql
+  php:
+    build:
+      dockerfile: ./docker/Dockerfile
+      target: php
+      args:
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
+    working_dir: /var/www/html
+    command: symfony serve --listen-ip=0.0.0.0 --no-tls
+    ports:
+      - 8000:8000
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - db
+  node:
+    image: node:20
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html
+    tty: true
+  phpmyadmin:
+    image: phpmyadmin
+    ports:
+      - 9988:80
+    environment:
+      - PMA_HOST=db
+      - PMA_USER=root
+      - PMA_PASSWORD=root
+      - MYSQL_ROOT_PASSWORD=root
+      - UPLOAD_LIMIT=512M
+    depends_on:
+      - db
 volumes:
-###> doctrine/doctrine-bundle ###
-  database_data:
-###< doctrine/doctrine-bundle ###
+  db_data:
