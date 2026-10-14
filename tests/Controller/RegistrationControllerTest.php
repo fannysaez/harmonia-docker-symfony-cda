@@ -15,13 +15,15 @@ class RegistrationControllerTest extends AbstractWebTestCase
         $this->assertSelectorExists('form');
     }
 
-    #[TestWith(['pas-un-email', 'TestUser', 'Password123'])]
-    #[TestWith(['test@test.com', 'TestUser', '123'])]
-    #[TestWith(['fanny.saez.0486@gmail.com', 'TestUser', 'Password123'])]
+    #[TestWith(['pas-un-email', 'TestUser', 'Password123', true])]
+    #[TestWith(['test@test.com', 'TestUser', '123', true])]
+    #[TestWith(['fanny.saez.0486@gmail.com', 'TestUser', 'Password123', true])]
+    #[TestWith(['test@test.com', 'TestUser', 'Password123', false])]
     public function testRegisterWithInvalidData(
         string $email,
         string $pseudo,
-        string $password
+        string $password,
+        bool $agreeTerms = true
     ): void {
         $client = static::createClient();
         $crawler = $client->request('GET', self::URL_REGISTER);
@@ -29,7 +31,7 @@ class RegistrationControllerTest extends AbstractWebTestCase
             'registration_form[email]'         => $email,
             'registration_form[pseudo]'        => $pseudo,
             'registration_form[plainPassword]' => $password,
-            'registration_form[agreeTerms]'    => true,
+            'registration_form[agreeTerms]'    => $agreeTerms,
         ]);
         $client->submit($form);
         $this->assertResponseStatusCodeSame(422);
