@@ -27,15 +27,16 @@ class RegistrationControllerTest extends AbstractWebTestCase
         $this->assertSelectorTextContains('button[type="submit"]', "S'inscrire");
     }
 
-    #[TestWith(['pas-un-email', 'TestUser', 'Password123', true])]
-    #[TestWith(['test@test.com', 'TestUser', '123', true])]
-    #[TestWith(['fanny.saez.0486@gmail.com', 'TestUser', 'Password123', true])]
-    #[TestWith(['test@test.com', 'TestUser', 'Password123', false])]
+    #[TestWith(['pas-un-email', 'TestUser', 'Password123', true, 422])]
+    #[TestWith(['test@test.com', 'TestUser', '123', true, 422])]
+    #[TestWith(['fanny.saez.0486@gmail.com', 'TestUser', 'Password123', true, 422])]
+    #[TestWith(['test@test.com', 'TestUser', 'Password123', false, 422])]
     public function testRegisterWithInvalidData(
         string $email,
         string $pseudo,
         string $password,
-        bool $agreeTerms = true
+        bool $agreeTerms,
+        int $code
     ): void {
         $client = static::createClient();
         $crawler = $client->request('GET', self::URL_REGISTER);
@@ -46,7 +47,7 @@ class RegistrationControllerTest extends AbstractWebTestCase
             'registration_form[agreeTerms]'    => $agreeTerms,
         ]);
         $client->submit($form);
-        $this->assertResponseStatusCodeSame(422);
+        $this->assertResponseStatusCodeSame($code);
         $this->assertSelectorExists('.is-invalid');
     }
 
