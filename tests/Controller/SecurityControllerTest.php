@@ -13,7 +13,7 @@ class SecurityControllerTest extends AbstractWebTestCase
         $client->request('GET', self::URL_LOGIN);
 
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h1', 'Connexion'); // ← vérifie ton h1
+        $this->assertSelectorTextContains('h1', 'Connexion');
     }
 
     public function testFormExists(): void
@@ -23,6 +23,7 @@ class SecurityControllerTest extends AbstractWebTestCase
 
         $this->assertSelectorExists('input[name="email"]');
         $this->assertSelectorExists('input[name="password"]');
+        $this->assertSelectorExists('input[name="_remember_me"]');
         $this->assertSelectorExists('button[type="submit"]');
     }
 
@@ -40,7 +41,7 @@ class SecurityControllerTest extends AbstractWebTestCase
         $client = static::createClient();
         $crawler = $client->request('GET', self::URL_LOGIN);
 
-        $form = $crawler->selectButton('Se connecter')->form(); // ← vérifie le texte du bouton
+        $form = $crawler->selectButton('Se connecter')->form();
         $form['email'] = $email;
         $form['password'] = $password;
         $client->submit($form);
@@ -49,7 +50,7 @@ class SecurityControllerTest extends AbstractWebTestCase
 
         if ($path === self::URL_LOGIN) {
             $client->followRedirect();
-            $this->assertSelectorExists('.alert'); // ← vérifie ton sélecteur d'erreur
+            $this->assertSelectorExists('div.alert.alert-danger');
         }
     }
 
