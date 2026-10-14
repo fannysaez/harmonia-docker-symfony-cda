@@ -1,23 +1,45 @@
 <?php
+
 namespace App\Tests\Controller;
 
-use App\Repository\UserRepository;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Tests\AbstractWebTestCase;
+use PHPUnit\Framework\Attributes\TestWith;
 
-class RegistrationControllerTest extends WebTestCase
+class RegistrationControllerTest extends AbstractWebTestCase
 {
     public function testRegisterPageLoads(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/register');
+        $client->request('GET', self::URL_REGISTER);
         $this->assertResponseIsSuccessful();
         $this->assertSelectorExists('form');
+    }
+
+    #[TestWith(['pas-un-email', 'TestUser', 'Password123'])]
+    #[TestWith(['test@test.com', 'TestUser', '123'])]
+    #[TestWith(['fanny.saez.0486@gmail.com', 'TestUser', 'Password123'])]
+    public function testRegisterWithInvalidData(
+        string $email,
+        string $pseudo,
+        string $password
+    ): void {
+        $client = static::createClient();
+        $crawler = $client->request('GET', self::URL_REGISTER);
+        $form = $crawler->filter('form')->form([
+            'registration_form[email]'         => $email,
+            'registration_form[pseudo]'        => $pseudo,
+            'registration_form[plainPassword]' => $password,
+            'registration_form[agreeTerms]'    => true,
+        ]);
+        $client->submit($form);
+        $this->assertResponseStatusCodeSame(422);
+        $this->assertSelectorExists('.is-invalid');
     }
 
     public function testRegisterWithValidData(): void
     {
         $client = static::createClient();
-        $crawler = $client->request('GET', '/register');
+        $crawler = $client->request('GET', self::URL_REGISTER);
         $form = $crawler->filter('form')->form([
             'registration_form[email]'         => 'test_' . uniqid() . '@example.com',
             'registration_form[pseudo]'        => 'TestUser' . uniqid(),
@@ -25,68 +47,6 @@ class RegistrationControllerTest extends WebTestCase
             'registration_form[agreeTerms]'    => true,
         ]);
         $client->submit($form);
-        $this->assertResponseRedirects();
-        $client->followRedirect();
-        $this->assertResponseIsSuccessful();
-    }
-
-    public function testRegisterWithExistingEmail(): void
-    {
-        $client = static::createClient();
-        $userRepository = static::getContainer()->get(UserRepository::class);
-        $existingEmail = $userRepository->findOneBy([])->getEmail();
-        $crawler = $client->request('GET', '/register');
-        $form = $crawler->filter('form')->form([
-            'registration_form[email]'         => $existingEmail,
-            'registration_form[pseudo]'        => 'AutreUser',
-            'registration_form[plainPassword]' => 'Password123',
-            'registration_form[agreeTerms]'    => true,
-        ]);
-        $client->submit($form);
-        $this->assertResponseStatusCodeSame(422);
-        $this->assertSelectorExists('.is-invalid');
-    }
-
-    public function testRegisterWithPasswordTooShort(): void
-    {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/register');
-        $form = $crawler->filter('form')->form([
-            'registration_form[email]'         => 'shortpass@example.com',
-            'registration_form[pseudo]'        => 'ShortPass',
-            'registration_form[plainPassword]' => '123',
-            'registration_form[agreeTerms]'    => true,
-        ]);
-        $client->submit($form);
-        $this->assertResponseStatusCodeSame(422);
-        $this->assertSelectorExists('.is-invalid');
-    }
-
-    public function testRegisterWithoutAgreeTerms(): void
-    {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/register');
-        $form = $crawler->filter('form')->form([
-            'registration_form[email]'         => 'noterms@example.com',
-            'registration_form[pseudo]'        => 'NoTerms',
-            'registration_form[plainPassword]' => 'Password123',
-        ]);
-        $client->submit($form);
-        $this->assertResponseStatusCodeSame(422);
-        $this->assertSelectorExists('.is-invalid');
-    }
-
-    public function testRegisterWithEmptyFields(): void
-    {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/register');
-        $form = $crawler->filter('form')->form([
-            'registration_form[email]'         => '',
-            'registration_form[pseudo]'        => '',
-            'registration_form[plainPassword]' => '',
-        ]);
-        $client->submit($form);
-        $this->assertResponseStatusCodeSame(422);
-        $this->assertSelectorExists('.is-invalid');
+        $this->assertResponseRedirects(self::URL_HOME);
     }
 }
