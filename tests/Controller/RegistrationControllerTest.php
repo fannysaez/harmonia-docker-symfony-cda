@@ -15,6 +15,18 @@ class RegistrationControllerTest extends AbstractWebTestCase
         $this->assertSelectorExists('form');
     }
 
+    public function testFormExists(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', self::URL_REGISTER);
+
+        $this->assertSelectorExists('input[name="registration_form[email]"]');
+        $this->assertSelectorExists('input[name="registration_form[plainPassword]"]');
+        $this->assertSelectorExists('input[name="registration_form[pseudo]"]');
+        $this->assertSelectorExists('input[name="registration_form[agreeTerms]"]');
+        $this->assertSelectorTextContains('button[type="submit"]', "S'inscrire");
+    }
+
     #[TestWith(['pas-un-email', 'TestUser', 'Password123', true])]
     #[TestWith(['test@test.com', 'TestUser', '123', true])]
     #[TestWith(['fanny.saez.0486@gmail.com', 'TestUser', 'Password123', true])]
