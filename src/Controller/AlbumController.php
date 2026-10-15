@@ -50,6 +50,14 @@ final class AlbumController extends AbstractController
         ]);
     }
 
+    #[Route('/album/search', name: 'app_album_search')]
+    public function search(AlbumRepository $albumRepository, Request $request): Response
+    {
+        $search = $request->query->get('search', '');
+        $albums = $albumRepository->findByTitleLike($search);
+        return $this->json(['albums' => $albums], 200, [], ['groups' => ['album:read']]);
+    }
+
     #[Route('/album/{id}', name: 'app_album_show')]
     public function show(Album $album): Response
     {
