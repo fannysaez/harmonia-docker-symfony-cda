@@ -1,12 +1,24 @@
 {% extends 'base.html.twig' %}
 {% block title %}Harmonia{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="module" src="{{ asset('album-search.js') }}"></script>
+{% endblock %}
+
 {% block body %}
 
     <div class="p-5 mb-5 bg-dark text-white rounded-3 text-center">
         <i class="bi bi-music-note-beamed display-4"></i>
         <h1 class="display-5 fw-bold mt-3">Bienvenue sur Harmonia</h1>
         <p class="fs-5 text-secondary">Découvrez, écoutez et sauvegardez vos albums préférés.</p>
-        <a href="{{ path('app_albums') }}" class="btn btn-warning btn-lg me-2">Découvrir les albums</a>    </div>
+        <a href="{{ path('app_albums') }}" class="btn btn-warning btn-lg me-2">Découvrir les albums</a>
+    </div>
+
+    <div class="mb-4">
+        <input type="text" id="search-album" class="form-control" placeholder="Rechercher un album...">
+        <div id="search-results" class="mt-3"></div>
+    </div>
 
     <h4 class="mb-3">Dernières sorties</h4>
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-4">

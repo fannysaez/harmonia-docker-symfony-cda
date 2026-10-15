@@ -69,4 +69,13 @@ class AlbumRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    public function findByTitleLike(string $title): array
+{
+    return $this->createQueryBuilder('a')
+        ->andWhere('a.title LIKE :title')
+        ->setParameter('title', '%' . $title . '%')
+        ->getQuery()
+        ->getResult();
+}
 }
