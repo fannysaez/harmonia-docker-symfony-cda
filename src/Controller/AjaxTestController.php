@@ -48,4 +48,11 @@ final class AjaxTestController extends AbstractController
         }
         return $this->json(['is_pokemon_exist' => $found]);
     }
+
+#[Route('/ajax/test-serialization', name: 'app_ajax_test_serialization')]
+public function testSerialization(GenreRepository $genreRepository): Response
+{
+    $genres = $genreRepository->findAll();
+    return $this->json(['genres' => $genres], 200, [], ['groups' => 'genre:read']);
+}
 }
