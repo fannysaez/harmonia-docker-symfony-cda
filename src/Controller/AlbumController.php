@@ -6,6 +6,7 @@ use App\Entity\Album;
 use App\Form\AlbumType;
 use App\Repository\AlbumRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,35 +18,35 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 final class AlbumController extends AbstractController
 {
     #[Route('/album', name: 'app_albums')]
-    public function index(AlbumRepository $albumRepository, Request $request): Response
+    public function index(AlbumRepository $albumRepository, Request $request, PaginatorInterface $paginator): Response
     {
         $limit = 4;
 
-        $pageAlbum = $request->query->getInt('pageAlbum', 1);
-        $pageEP = $request->query->getInt('pageEP', 1);
-        $pageSingle = $request->query->getInt('pageSingle', 1);
+        $albums = $paginator->paginate(
+            $albumRepository->findByTypeQuery('album'),
+            $request->query->getInt('pageAlbum', 1),
+            $limit,
+            ['pageParameterName' => 'pageAlbum']
+        );
 
-        $albums = $albumRepository->findByTypePaginated('album', $pageAlbum, $limit);
-        $totalAlbums = $albumRepository->countByType('album');
+        $EP = $paginator->paginate(
+            $albumRepository->findByTypeQuery('EP'),
+            $request->query->getInt('pageEP', 1),
+            $limit,
+            ['pageParameterName' => 'pageEP']
+        );
 
-        $EP = $albumRepository->findByTypePaginated('EP', $pageEP, $limit);
-        $totalEP = $albumRepository->countByType('EP');
-
-        $singles = $albumRepository->findByTypePaginated('single', $pageSingle, $limit);
-        $totalSingles = $albumRepository->countByType('single');
+        $singles = $paginator->paginate(
+            $albumRepository->findByTypeQuery('single'),
+            $request->query->getInt('pageSingle', 1),
+            $limit,
+            ['pageParameterName' => 'pageSingle']
+        );
 
         return $this->render('album/albums.html.twig', [
-            'albums' => $albums,
-            'totalPagesAlbum' => ceil($totalAlbums / $limit),
-            'pageAlbum' => $pageAlbum,
-
-            'EP' => $EP,
-            'totalPagesEP' => ceil($totalEP / $limit),
-            'pageEP' => $pageEP,
-
+            'albums'  => $albums,
+            'EP'      => $EP,
             'singles' => $singles,
-            'totalPagesSingle' => ceil($totalSingles / $limit),
-            'pageSingle' => $pageSingle,
         ]);
     }
 
@@ -66,7 +67,6 @@ final class AlbumController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
             /** @var UploadedFile|null $coverFile */
             $coverFile = $form->get('coverImageFile')->getData();
 
@@ -108,7 +108,6 @@ final class AlbumController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
             /** @var UploadedFile|null $coverFile */
             $coverFile = $form->get('coverImageFile')->getData();
 
@@ -130,7 +129,7 @@ final class AlbumController extends AbstractController
         }
 
         return $this->render('album/edit.html.twig', [
-            'form' => $form->createView(),
+            'form'  => $form->createView(),
             'album' => $album,
         ]);
     }

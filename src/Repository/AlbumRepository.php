@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Album;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 class AlbumRepository extends ServiceEntityRepository
@@ -11,6 +12,15 @@ class AlbumRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Album::class);
+    }
+
+    public function findByTypeQuery(string $type): Query
+    {
+        return $this->createQueryBuilder('a')
+            ->where('a.type = :type')
+            ->setParameter('type', $type)
+            ->orderBy('a.releaseDate', 'DESC')
+            ->getQuery();
     }
 
     public function findByTypePaginated(string $type, int $page, int $limit): array

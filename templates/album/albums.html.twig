@@ -36,17 +36,9 @@
                     <p>Aucun album trouvé.</p>
                 {% endfor %}
             </div>
-            {% if totalPagesAlbum > 1 %}
-                <nav class="d-flex justify-content-center mb-4">
-                    <ul class="pagination">
-                        {% for i in 1..totalPagesAlbum %}
-                            <li class="page-item {% if i == pageAlbum %}active{% endif %}">
-                                <a class="page-link" href="{{ path('app_albums', {pageAlbum: i}) }}">{{ i }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </nav>
-            {% endif %}
+            <div class="d-flex justify-content-center">
+                {{ knp_pagination_render(albums) }}
+            </div>
         </div>
 
         <div class="tab-pane fade" id="ep">
@@ -59,17 +51,9 @@
                     <p>Aucun EP trouvé.</p>
                 {% endfor %}
             </div>
-            {% if totalPagesEP > 1 %}
-                <nav class="d-flex justify-content-center mb-4">
-                    <ul class="pagination">
-                        {% for i in 1..totalPagesEP %}
-                            <li class="page-item {% if i == pageEP %}active{% endif %}">
-                                <a class="page-link" href="{{ path('app_albums', {pageEP: i}) }}">{{ i }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </nav>
-            {% endif %}
+            <div class="d-flex justify-content-center">
+                {{ knp_pagination_render(EP) }}
+            </div>
         </div>
 
         <div class="tab-pane fade" id="singles">
@@ -82,17 +66,9 @@
                     <p>Aucun single trouvé.</p>
                 {% endfor %}
             </div>
-            {% if totalPagesSingle > 1 %}
-                <nav class="d-flex justify-content-center mb-4">
-                    <ul class="pagination">
-                        {% for i in 1..totalPagesSingle %}
-                            <li class="page-item {% if i == pageSingle %}active{% endif %}">
-                                <a class="page-link" href="{{ path('app_albums', {pageSingle: i}) }}">{{ i }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </nav>
-            {% endif %}
+            <div class="d-flex justify-content-center">
+                {{ knp_pagination_render(singles) }}
+            </div>
         </div>
     </div>
 
