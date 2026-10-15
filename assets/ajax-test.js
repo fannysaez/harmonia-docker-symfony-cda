@@ -31,7 +31,7 @@ const nbGenreInitial = await checkGenre();
 
 setInterval(async () => {
     const nbGenreActuel = await checkGenre();
-    console.log('actuel:', nbGenreActuel, '/ initial:', nbGenreInitial);
+    // console.log('actuel:', nbGenreActuel, '/ initial:', nbGenreInitial);
     if (nbGenreActuel > nbGenreInitial) {
         alert('Nouveau genre ajouté !');
     }
