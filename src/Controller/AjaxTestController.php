@@ -32,13 +32,19 @@ final class AjaxTestController extends AbstractController
     #[Route('/ajax/count_genre', name: 'app_ajax_count_genre')]
     public function countGenre(GenreRepository $genreRepository): JsonResponse
     {
-        $nb = count($genreRepository->findAll());
-        return $this->json(['nb' => $nb]);
+        $entities = $genreRepository->findAll();
+        $total = count($entities);
+        return $this->json(['total_genres' => $total]);
     }
-    #[Route('/ajax/check_pokemon', name: 'app_ajax_check_pokemon')]
-    public function checkPokemon(GenreRepository $genreRepository): JsonResponse
+
+    #[Route('/ajax/check_pokemon_genre', name: 'app_ajax_check_pokemon_genre')]
+    public function checkPokemonGenre(GenreRepository $genreRepository): JsonResponse
     {
         $genre = $genreRepository->findOneBy(['name' => 'pokemon']);
-        return $this->json(['exists' => $genre !== null]);
+        $found = false;
+        if ($genre !== null) {
+            $found = true;
+        }
+        return $this->json(['is_pokemon_exist' => $found]);
     }
 }

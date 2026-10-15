@@ -21,29 +21,37 @@ async function testAjax2() {
     console.log(data);
 }
 
-async function checkGenre() {
+let total = 0;
+
+async function getCountGenre() {
     const response = await fetch('/ajax/count_genre');
     const data = await response.json();
-    return data.nb;
+
+    if (total !== 0 && data.total_genres !== total) {
+        alert('Genre supprimé ou ajouté');
+    }
+
+    total = data.total_genres;
+    console.log(total);
 }
 
-const nbGenreInitial = await checkGenre();
+getCountGenre();
 
-setInterval(async () => {
-    const nbGenreActuel = await checkGenre();
-    // console.log('actuel:', nbGenreActuel, '/ initial:', nbGenreInitial);
-    if (nbGenreActuel > nbGenreInitial) {
-        alert('Nouveau genre ajouté !');
-    }
+setInterval(() => {
+    getCountGenre();
 }, 5000);
 
-let btnPokemon = document.querySelector('#btn-pokemon');
+let btnPokemon = document.querySelector('#check-pokemon');
 if (btnPokemon !== null) {
-    btnPokemon.addEventListener('click', async () => {
-        const response = await fetch('/ajax/check_pokemon');
-        const data = await response.json();
-        if (data.exists) {
-            alert('Le genre Pokemon existe !');
-        }
+    btnPokemon.addEventListener('click', () => {
+        checkPokemonGenre();
     });
+}
+
+async function checkPokemonGenre() {
+    const response = await fetch('/ajax/check_pokemon_genre');
+    const data = await response.json();
+    if (data.is_pokemon_exist === true) {
+        alert('Le genre avec pokemon existe !!');
+    }
 }
