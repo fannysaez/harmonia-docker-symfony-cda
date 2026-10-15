@@ -24,6 +24,15 @@ class GenreRepository extends ServiceEntityRepository
             ->getQuery();
     }
 
+    public function findByNameLike(string $name): array
+{
+    return $this->createQueryBuilder('g')
+        ->andWhere('g.name LIKE :name')
+        ->setParameter('name', '%' . $name . '%')
+        ->getQuery()
+        ->getResult();
+}
+
 //    /**
 //     * @return Genre[] Returns an array of Genre objects
 //     */
