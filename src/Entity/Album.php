@@ -6,6 +6,7 @@ use App\Repository\AlbumRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: AlbumRepository::class)]
 class Album
@@ -13,31 +14,39 @@ class Album
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['album:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['album:read'])]
     private ?string $title = null;
 
     #[ORM\Column]
+    #[Groups(['album:read'])]
     private ?\DateTimeImmutable $releaseDate = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['album:read'])]
     private ?string $coverImage = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['album:read'])]
     private ?string $type = null;
 
     #[ORM\Column]
+    #[Groups(['album:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'albums')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['album:read'])]
     private ?Artist $artist = null;
 
     /**
      * @var Collection<int, Track>
      */
     #[ORM\OneToMany(targetEntity: Track::class, mappedBy: 'album')]
+    #[Groups(['album:read'])]
     private Collection $tracks;
 
     public function __construct()
@@ -143,7 +152,6 @@ class Album
     public function removeTrack(Track $track): static
     {
         if ($this->tracks->removeElement($track)) {
-            // set the owning side to null (unless already changed)
             if ($track->getAlbum() === $this) {
                 $track->setAlbum(null);
             }

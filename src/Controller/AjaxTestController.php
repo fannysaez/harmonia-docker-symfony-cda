@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Repository\AlbumRepository;
 
 final class AjaxTestController extends AbstractController
 {
@@ -55,4 +56,18 @@ public function testSerialization(GenreRepository $genreRepository): Response
     $genres = $genreRepository->findAll();
     return $this->json(['genres' => $genres], 200, [], ['groups' => 'genre:read']);
 }
+
+#[Route('/ajax/test-serialization-albums', name: 'app_ajax_test_serialization_albums')]
+public function testSerializationAlbums(AlbumRepository $albumRepository): Response
+{
+    $albums = $albumRepository->findAll();
+    return $this->json(['albums' => $albums], 200, [], ['groups' => 'album:read']);
+}
+#[Route('/ajax/test-serialization-album', name: 'app_ajax_test_serialization_album')]
+public function testSerializationAlbum(AlbumRepository $albumRepository): Response
+{
+    $albums = $albumRepository->findAll();
+return $this->json(['albums' => $albums], 200, [], ['groups' => ['album:read']]);
+}
+
 }
