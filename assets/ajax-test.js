@@ -36,3 +36,14 @@ setInterval(async () => {
         alert('Nouveau genre ajouté !');
     }
 }, 5000);
+
+let btnPokemon = document.querySelector('#btn-pokemon');
+if (btnPokemon !== null) {
+    btnPokemon.addEventListener('click', async () => {
+        const response = await fetch('/ajax/check_pokemon');
+        const data = await response.json();
+        if (data.exists) {
+            alert('Le genre Pokemon existe !');
+        }
+    });
+}
