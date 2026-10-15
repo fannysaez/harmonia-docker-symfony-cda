@@ -8,67 +8,49 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ path('app_home') }}">Accueil</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ path('app_albums') }}">Albums</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ path('app_artist_list') }}">Artistes</a>
-                </li>
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_home') }}">Accueil</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_albums') }}">Albums</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_artist_list') }}">Artistes</a></li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        Genres
-                    </a>
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Genres</a>
                     <ul class="dropdown-menu">
                         {% for genre in get_genres()|slice(0, 5) %}
-                            <li>
-                                <a class="dropdown-item" href="{{ path('app_genre_list') }}">
-                                    <span class="badge me-1" style="background-color: {{ genre.color }}"> </span>
-                                    {{ genre.name }}
-                                </a>
-                            </li>
+                            <li><a class="dropdown-item" href="{{ path('app_genre_list') }}">
+                                <span class="badge me-1" style="background-color: {{ genre.color }}"> </span>
+                                {{ genre.name }}
+                            </a></li>
                         {% endfor %}
                         <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="{{ path('app_genre_list') }}">
-                                Voir tous les genres
-                            </a>
-                        </li>
+                        <li><a class="dropdown-item" href="{{ path('app_genre_list') }}">Voir tous les genres</a></li>
                     </ul>
                 </li>
-                {% if app.user %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('app_profil') }}">Mon profil</a>
-                    </li>
-                    {% if is_granted('ROLE_ADMIN') %}
-                        <li class="nav-item">
-                            <a class="nav-link text-warning" href="{{ path('app_admin_dashboard') }}">
-                                <i class="bi bi-speedometer2 me-1"></i>Dashboard
-                            </a>
-                        </li>
-                    {% endif %}
-                {% endif %}
             </ul>
-
             <ul class="navbar-nav ms-auto align-items-center gap-2">
                 {% if app.user %}
-                    <li class="nav-item">
-                        <span class="nav-link text-secondary small">
-                            Bonjour, {% if is_granted('ROLE_ADMIN') %}Administratrice{% else %}{{ app.user.firstname ?? app.user.pseudo }}{% endif %}
-                        </span>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-outline-light btn-sm" href="{{ path('app_logout') }}">Se déconnecter</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-1"></i>
+                            {% set hour = "now"|date("H")|number_format(0) %}
+                            {% if hour < 12 %}Bonjour,
+                            {% elseif hour < 17 %}Bon après-midi,
+                            {% else %}Bonsoir,
+                            {% endif %}
+                            {% if is_granted('ROLE_ADMIN') %}Administratrice{% else %}{{ app.user.firstname ?? app.user.pseudo }}{% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ path('app_profil') }}"><i class="bi bi-person me-1"></i>Mon profil</a></li>
+                            <li><a class="dropdown-item" href="{{ path('app_favorites') }}"><i class="bi bi-heart me-1"></i>Mes favoris</a></li>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item fw-bold" style="color: #fd7e14;" href="{{ path('app_admin_dashboard') }}"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{{ path('app_logout') }}"><i class="bi bi-box-arrow-right me-1"></i>Se déconnecter</a></li>
+                        </ul>
                     </li>
                 {% else %}
-                    <li class="nav-item">
-                        <a class="btn btn-outline-light btn-sm" href="{{ path('app_login') }}">Se connecter</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-primary btn-sm" href="{{ path('app_register') }}">S'inscrire</a>
-                    </li>
+                    <li class="nav-item"><a class="btn btn-outline-light btn-sm" href="{{ path('app_login') }}">Se connecter</a></li>
+                    <li class="nav-item"><a class="btn btn-primary btn-sm" href="{{ path('app_register') }}">S'inscrire</a></li>
                 {% endif %}
             </ul>
         </div>

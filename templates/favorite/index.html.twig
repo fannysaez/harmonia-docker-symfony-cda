@@ -1,20 +1,27 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello FFavoriteController!{% endblock %}
+{% block title %}Mes favoris{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div class="container mt-4">
+    <h1 class="mb-4">Mes favoris</h1>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/home/devdesign/dev/symfony/harmonia/Harmonia/src/Controller/FFavoriteController.php</code></li>
-        <li>Your template at <code>/home/devdesign/dev/symfony/harmonia/Harmonia/templates/f_favorite/index.html.twig</code></li>
-    </ul>
+    {% if tracks is empty %}
+        <p class="text-muted">Tu n'as pas encore de favoris.</p>
+    {% else %}
+        <div class="list-group">
+            {% for track in tracks %}
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ track.title }}</strong>
+                        — {{ track.album.title }}
+                    </div>
+                    <a href="{{ path('app_favorite', {track_id: track.id}) }}" class="btn btn-sm btn-outline-danger">
+                        ❤️ Retirer
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

@@ -13,6 +13,18 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class FavoriteController extends AbstractController
 {
     #[IsGranted('ROLE_USER')]
+    #[Route('/favorites', name: 'app_favorites')]
+    public function index(): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        return $this->render('favorite/index.html.twig', [
+            'tracks' => $user->getFavoriteTracks(),
+        ]);
+    }
+
+    #[IsGranted('ROLE_USER')]
     #[Route('/favorite/{track_id}', name: 'app_favorite')]
     public function toggle(int $track_id, TrackRepository $trackRepository, EntityManagerInterface $em): Response
     {
@@ -32,7 +44,6 @@ final class FavoriteController extends AbstractController
 
         $em->flush();
 
-        // Redirige vers l'album plutôt que le profil
         return $this->redirectToRoute('app_album_show', ['id' => $track->getAlbum()->getId()]);
     }
 }
