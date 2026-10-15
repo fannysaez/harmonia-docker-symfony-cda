@@ -5,6 +5,7 @@ use App\Entity\Artist;
 use App\Form\ArtistType;
 use App\Repository\ArtistRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,9 +15,14 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class ArtistController extends AbstractController
 {
     #[Route('/artist', name: 'app_artist_list')]
-    public function list(ArtistRepository $artistRepository): Response
+    public function list(ArtistRepository $artistRepository, Request $request, PaginatorInterface $paginator): Response
     {
-        $artists = $artistRepository->findAll();
+        $artists = $paginator->paginate(
+            $artistRepository->findAllQuery(),
+            $request->query->getInt('page', 1),
+            6
+        );
+
         return $this->render('artist/list.html.twig', [
             'artists' => $artists,
         ]);

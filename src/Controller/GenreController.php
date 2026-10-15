@@ -5,6 +5,7 @@ use App\Entity\Genre;
 use App\Form\GenreType;
 use App\Repository\GenreRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,9 +16,15 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class GenreController extends AbstractController
 {
     #[Route('/admin/genres', name: 'app_genre_list')]
-    public function list(GenreRepository $repo): Response
+    public function list(GenreRepository $repo, Request $request, PaginatorInterface $paginator): Response
     {
-        return $this->render('genre/list.html.twig', ['genres' => $repo->findAll()]);
+        $genres = $paginator->paginate(
+            $repo->findAllQuery(),
+            $request->query->getInt('page', 1),
+            5
+        );
+
+        return $this->render('genre/list.html.twig', ['genres' => $genres]);
     }
 
     #[Route('/admin/genre/add', name: 'app_genre_add')]

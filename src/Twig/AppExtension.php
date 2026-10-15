@@ -3,20 +3,15 @@
 namespace App\Twig;
 
 use App\Repository\GenreRepository;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
+use Twig\Attribute\AsTwigFunction;
 
-class AppExtension extends AbstractExtension
+final readonly class AppExtension
 {
-    public function __construct(private GenreRepository $genreRepository) {}
+    public function __construct(
+        private GenreRepository $genreRepository
+    ) {}
 
-    public function getFunctions(): array
-    {
-        return [
-            new TwigFunction('getGenres', [$this, 'getGenres']),
-        ];
-    }
-
+    #[AsTwigFunction('get_genres')]
     public function getGenres(): array
     {
         return $this->genreRepository->findBy([], ['name' => 'ASC']);

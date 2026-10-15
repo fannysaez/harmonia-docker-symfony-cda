@@ -9,6 +9,7 @@ use App\Repository\AlbumRepository;
 use App\Repository\PlaylistRepository;
 use App\Repository\TrackRepository;
 use App\Repository\UserRepository;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -54,6 +55,7 @@ final class AdminController extends AbstractController
             'totalPages'  => $totalPages,
         ]);
     }
+
     #[Route('/admin/tracks', name: 'app_admin_tracks')]
     public function tracks(TrackRepository $trackRepository, Request $request): Response
     {
@@ -75,6 +77,7 @@ final class AdminController extends AbstractController
             'totalPages' => $totalPages,
         ]);
     }
+
     #[Route('/admin/playlists', name: 'app_admin_playlists')]
     public function playlists(PlaylistRepository $playlistRepository): Response
     {
@@ -92,10 +95,16 @@ final class AdminController extends AbstractController
     }
 
     #[Route('/admin/genres', name: 'app_admin_genres')]
-    public function genres(GenreRepository $genreRepository): Response
+    public function genres(GenreRepository $genreRepository, Request $request, PaginatorInterface $paginator): Response
     {
+        $genres = $paginator->paginate(
+            $genreRepository->findAllQuery(),
+            $request->query->getInt('page', 1),
+            5
+        );
+
         return $this->render('admin/genres/index.html.twig', [
-            'genres' => $genreRepository->findBy([], ['name' => 'ASC']),
+            'genres' => $genres,
         ]);
     }
 

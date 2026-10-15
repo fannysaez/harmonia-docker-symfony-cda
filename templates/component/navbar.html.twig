@@ -14,12 +14,15 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ path('app_albums') }}">Albums</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('app_artist_list') }}">Artistes</a>
+                </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                         Genres
                     </a>
                     <ul class="dropdown-menu">
-                        {% for genre in getGenres() %}
+                        {% for genre in get_genres()|slice(0, 5) %}
                             <li>
                                 <a class="dropdown-item" href="{{ path('app_genre_list') }}">
                                     <span class="badge me-1" style="background-color: {{ genre.color }}"> </span>
@@ -27,6 +30,12 @@
                                 </a>
                             </li>
                         {% endfor %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="{{ path('app_genre_list') }}">
+                                Voir tous les genres
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 {% if app.user %}
