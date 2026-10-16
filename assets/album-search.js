@@ -16,9 +16,9 @@ async function searchAlbum(search) {
 
     data.albums.forEach(album => {
         resultsDiv.innerHTML += `
-            <div class="card mb-2 p-2">
-                <strong>${album.title}</strong> — ${album.artist.stageName}
-            </div>
+            <a href="/album/${album.id}" class="card mb-2 p-2 text-decoration-none text-dark d-block">
+                <strong>${album.title}</strong> — ${album.artist ? album.artist.stageName : 'Artiste inconnu'}
+            </a>
         `;
     });
 }
