@@ -71,11 +71,21 @@ class AlbumRepository extends ServiceEntityRepository
     }
 
     public function findByTitleLike(string $title): array
-{
-    return $this->createQueryBuilder('a')
-        ->andWhere('a.title LIKE :title')
-        ->setParameter('title', '%' . $title . '%')
-        ->getQuery()
-        ->getResult();
-}
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.title LIKE :title')
+            ->setParameter('title', '%' . $title . '%')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAlbumsLike(string $search): array
+    {
+        $search = str_replace(' ', '%', $search);
+        return $this->createQueryBuilder('a')
+            ->where('a.title LIKE :search')
+            ->setParameter('search', '%' . $search . '%')
+            ->getQuery()
+            ->getResult();
+    }
 }

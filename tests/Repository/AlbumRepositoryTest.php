@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Tests\Repository;
 
 use App\Repository\AlbumRepository;
@@ -14,6 +13,8 @@ class AlbumRepositoryTest extends KernelTestCase
         self::bootKernel();
         $this->albumRepository = self::getContainer()->get(AlbumRepository::class);
     }
+
+    // ---- tests originaux ----
 
     public function testFindByTitleLikeReturnsResults(): void
     {
@@ -39,5 +40,44 @@ class AlbumRepositoryTest extends KernelTestCase
         $results = $this->albumRepository->findLastAdded(5);
         $this->assertIsArray($results);
         $this->assertLessThanOrEqual(5, count($results));
+    }
+
+    // ---- dataProvider findByTitleLike ----
+
+    public static function titleSearchProvider(): array
+    {
+        return [
+            'lettre a'       => ['a'],
+            'mot dark'       => ['dark'],
+            'vide'           => [''],
+            'aucun résultat' => ['zzzzzzzzzz'],
+        ];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('titleSearchProvider')]
+    public function testFindByTitleLikeWithProvider(string $query): void
+    {
+        $results = $this->albumRepository->findByTitleLike($query);
+        $this->assertIsArray($results);
+    }
+
+    // ---- tests findAlbumsLike ----
+
+    public function testFindAlbumsLikeReturnsArray(): void
+    {
+        $results = $this->albumRepository->findAlbumsLike('a');
+        $this->assertIsArray($results);
+    }
+
+    public function testFindAlbumsLikeWithSpaceInQuery(): void
+    {
+        $results = $this->albumRepository->findAlbumsLike('dark side');
+        $this->assertIsArray($results);
+    }
+
+    public function testFindAlbumsLikeWithNoResults(): void
+    {
+        $results = $this->albumRepository->findAlbumsLike('zzzzzzzzzz');
+        $this->assertCount(0, $results);
     }
 }
