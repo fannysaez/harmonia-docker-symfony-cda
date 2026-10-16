@@ -28,4 +28,25 @@ class SearchTest extends AbstractWebTestCase
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('albums', $data);
     }
+
+    public static function searchProvider(): array
+    {
+        return [
+            'lettre a'       => ['a'],
+            'mot the'        => ['the'],
+            'vide'           => [''],
+            'aucun résultat' => ['zzzzzzzzzz'],
+        ];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('searchProvider')]
+    public function testSearchWithProvider(string $query): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/album/search', ['search' => $query]);
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('content-type', 'application/json');
+        $data = json_decode($client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('albums', $data);
+    }
 }
