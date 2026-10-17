@@ -16,6 +16,13 @@ class AlbumControllerTest extends AbstractWebTestCase
         $this->assertResponseIsSuccessful();
     }
 
+    public function testAlbumListPagePagination(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', self::URL_ALBUM . '?page=2');
+        $this->assertResponseIsSuccessful();
+    }
+
     public function testAlbumShowPage(): void
     {
         $client = static::createClient();
