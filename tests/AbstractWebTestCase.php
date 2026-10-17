@@ -4,21 +4,23 @@ namespace App\Tests;
 
 use App\Repository\UserRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 abstract class AbstractWebTestCase extends WebTestCase
 {
-    const string URL_HOME       = '/';
-    const string URL_LOGIN      = '/login';
-    const string URL_REGISTER   = '/register';
-    const string URL_ALBUM      = '/album';
-    const string URL_ARTIST     = '/artist';
-    const string URL_PLAYLISTS  = '/playlists';
-    const string URL_PROFIL     = '/profil';
-    const string URL_ADMIN      = '/admin';
+    const string URL_HOME             = '/';
+    const string URL_LOGIN            = '/login';
+    const string URL_REGISTER         = '/register';
+    const string URL_ALBUM            = '/album';
+    const string URL_ARTIST           = '/artist';
+    const string URL_PLAYLISTS        = '/playlists';
+    const string URL_PROFIL           = '/profil';
+    const string URL_ADMIN            = '/admin';
+    const string URL_ADMIN_ALBUM_NEW  = '/album-add';
 
-    const string USER_EMAIL     = 'fanny.saez.0486@gmail.com';
+    const string USER_EMAIL = 'fanny.saez.0486@gmail.com';
 
     protected function loginUser(
         KernelBrowser $client,
@@ -32,5 +34,12 @@ abstract class AbstractWebTestCase extends WebTestCase
     protected function getRepository(string $repoClass): ServiceEntityRepository
     {
         return static::getContainer()->get($repoClass);
+    }
+
+    protected function removeEntity(mixed $entity): void
+    {
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $em->remove($entity);
+        $em->flush();
     }
 }

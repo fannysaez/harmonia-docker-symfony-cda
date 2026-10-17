@@ -1,8 +1,11 @@
 <?php
 namespace App\Tests\Controller;
 
+use App\Repository\AlbumRepository;
+use App\Repository\ArtistRepository;
 use App\Tests\AbstractWebTestCase;
 use PHPUnit\Framework\Attributes\TestWith;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class AlbumControllerTest extends AbstractWebTestCase
 {
@@ -24,7 +27,7 @@ class AlbumControllerTest extends AbstractWebTestCase
     {
         $client = static::createClient();
         $this->loginUser($client);
-        $client->request('GET', '/album-add');
+        $client->request('GET', self::URL_ADMIN_ALBUM_NEW);
         $this->assertResponseIsSuccessful();
     }
 
@@ -41,5 +44,49 @@ class AlbumControllerTest extends AbstractWebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('h1', $title);
         $this->assertSelectorTextContains('span.badge.bg-secondary', $type);
+    }
+
+    public function testAddAlbumWithImage(): void
+    {
+        $client = static::createClient();
+        $this->loginUser($client);
+
+        // Récupérer un artiste valide en BDD
+        $artistRepo = $this->getRepository(ArtistRepository::class);
+        $artist = $artistRepo->findOneBy([]);
+
+        // Créer un faux fichier JPEG avec GD
+        $tempFile = tempnam(sys_get_temp_dir(), 'test_') . '.jpg';
+        $image = imagecreatetruecolor(10, 10);
+        imagejpeg($image, $tempFile);
+        imagedestroy($image);
+
+        $uploadedFile = new UploadedFile(
+            $tempFile,
+            'cover_test.jpg',
+            'image/jpeg',
+            null,
+            true // mode test
+        );
+
+        $client->request('GET', self::URL_ADMIN_ALBUM_NEW);
+        $this->assertResponseIsSuccessful();
+
+        $client->submitForm('Ajouter', [
+            'album[title]'          => 'Test Album PHPUnit',
+            'album[releaseDate]'    => '2024-01-01T00:00',
+            'album[type]'           => 'album',
+            'album[artist]'         => $artist->getId(),
+            'album[coverImageFile]' => $uploadedFile,
+        ]);
+
+        $this->assertResponseRedirects();
+
+        // Nettoyage — supprimer l'album créé
+        $albumRepo = $this->getRepository(AlbumRepository::class);
+        $album = $albumRepo->findOneBy(['title' => 'Test Album PHPUnit']);
+        if ($album) {
+            $this->removeEntity($album);
+        }
     }
 }
