@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Controller;
+namespace App\Tests\templates;
 
 use App\Tests\AbstractWebTestCase;
 
