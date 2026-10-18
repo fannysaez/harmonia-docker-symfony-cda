@@ -232,3 +232,4 @@ Développé par **Fanny** — Formation Conceptrice Développeuse Application 20
 ## Licence
 
 Projet réalisé dans le cadre d'une formation — usage éducatif uniquement.
+---
