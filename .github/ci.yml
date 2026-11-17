@@ -1,0 +1,44 @@
+name: CI Backend Harmonia
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      db:
+        image: mariadb:10.6
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: harmonia_cda
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -proot"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      DATABASE_URL: "mysql://root:root@127.0.0.1:3306/harmonia_cda?serverVersion=10.6.0-MariaDB&charset=utf8mb4"
+      APP_ENV: test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Installer PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: ctype, iconv, mbstring, pdo_mysql, intl
+          coverage: none
+
+      - name: Installer les dépendances Composer
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Exécuter les migrations
+        run: php bin/console doctrine:migrations:migrate --no-interaction --env=test
+
+      - name: Exécution des tests
+        run: php bin/phpunit
