@@ -10,7 +10,7 @@ jobs:
         image: mariadb:10.6
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: harmonia_cda
+          MYSQL_DATABASE: harmonia_cda_test
         ports:
           - 3306:3306
         options: >-
